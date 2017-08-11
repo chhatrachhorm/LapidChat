@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">LapidChat</string>
+    <string name="welcome">Talk Secretly With LapidChat</string>
+    <string name="login">Log in</string>
+    <string name="logout">Log out</string>
+    <string name="register">Create a Chat ID Now</string>
+    <string name="main_demo">Main Activity</string>
+    <string name="username">username</string>
+    <string name="email">email</string>
+    <string name="password">password</string>
+    <string name="channel_name">Main Notification</string>
+    <string name="channel_description">desc of channel</string>
+    <string name="account_setting">Account Setting</string>
+    <string name="users">Users</string>
+    <string name="welcome_page">Welcome to LapidChat</string>
+    <string name="create_id">Create an ID for LapidChat</string>
+    <string name="getting_started">Getting Started</string>
+</resources>

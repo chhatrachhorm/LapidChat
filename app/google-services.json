@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "874095613387",
+    "firebase_url": "https://lapidchat-a1b4b.firebaseio.com",
+    "project_id": "lapidchat-a1b4b",
+    "storage_bucket": "lapidchat-a1b4b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:874095613387:android:a8614c6f2729eab2",
+        "android_client_info": {
+          "package_name": "chhatrachhorm.androidapp.onenterpise.lapidchat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "874095613387-o2g7frh34qn6aqpgjglfjrieih9okork.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "chhatrachhorm.androidapp.onenterpise.lapidchat",
+            "certificate_hash": "04f886f4294ec5f4be0c61d4ec805fd3c5413c0a"
+          }
+        },
+        {
+          "client_id": "874095613387-9fl2u86fmfs74npspe3qkan2rvjn87ji.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAbLsikzp4b2RoIMxRPeY1dqDIFBSZhI7Q"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "874095613387-9fl2u86fmfs74npspe3qkan2rvjn87ji.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
