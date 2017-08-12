@@ -1,6 +1,7 @@
 package chhatrachhorm.androidapp.onenterpise.lapidchat;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputEditText;
@@ -8,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -57,6 +59,10 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View view) {
                 String email = EmailField.getEditableText().toString();
                 String password = PasswordField.getEditableText().toString();
+
+                InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+
                 if(!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)){
                     mLoginProgressDialog.setTitle("Checking your credential");
                     mLoginProgressDialog.setMessage("This may take a little while");

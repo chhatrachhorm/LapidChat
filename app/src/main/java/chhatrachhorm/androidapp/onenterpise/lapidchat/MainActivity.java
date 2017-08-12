@@ -3,6 +3,8 @@ package chhatrachhorm.androidapp.onenterpise.lapidchat;
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.os.Build;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -18,6 +20,10 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar mToolbar;
     private FirebaseAuth mAuth;
 
+    private ViewPager mViewPager;
+    private SectionsPagersAdapter mSectionsPagersAdapter;
+    private TabLayout mTabLayout;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +35,15 @@ public class MainActivity extends AppCompatActivity {
 
 
         mAuth = FirebaseAuth.getInstance();
+
+        mViewPager = findViewById(R.id.main_TapPager);
+
+        mSectionsPagersAdapter = new SectionsPagersAdapter(getSupportFragmentManager());
+        mViewPager.setAdapter(mSectionsPagersAdapter);
+
+        mTabLayout = findViewById(R.id.main_tabs);
+        mTabLayout.setupWithViewPager(mViewPager);
+
     }
 
     @Override

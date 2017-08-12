@@ -20,8 +20,10 @@
         <activity
             android:name=".RegisterActivity"
             android:parentActivityName=".WelcomeActivity" />
-        <activity android:name=".LoginActivity"
-            android:parentActivityName=".WelcomeActivity"></activity>
+        <activity
+            android:name=".LoginActivity"
+            android:parentActivityName=".WelcomeActivity" />
+        <activity android:name=".SettingsActivity"></activity>
     </application>
 
 </manifest>

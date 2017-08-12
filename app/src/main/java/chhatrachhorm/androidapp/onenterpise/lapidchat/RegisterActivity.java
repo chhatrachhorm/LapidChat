@@ -1,6 +1,7 @@
 package chhatrachhorm.androidapp.onenterpise.lapidchat;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputEditText;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -57,6 +59,10 @@ public class RegisterActivity extends AppCompatActivity {
                 String username = UsernameField.getEditableText().toString();
                 String email = EmailField.getEditableText().toString();
                 String password = PassField.getEditableText().toString();
+
+                InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+
                 if(!TextUtils.isEmpty(username) && !TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)){
 
                     mRegProgressDialog.setTitle("Assigning User ID");
