@@ -23,7 +23,9 @@
         <activity
             android:name=".LoginActivity"
             android:parentActivityName=".WelcomeActivity" />
-        <activity android:name=".SettingsActivity"></activity>
+        <activity android:name=".SettingsActivity" />
+        <activity android:name=".StatusChangesActivity"
+            android:parentActivityName=".SettingsActivity"></activity>
     </application>
 
 </manifest>

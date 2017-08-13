@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -76,6 +77,12 @@ public class MainActivity extends AppCompatActivity {
             FirebaseAuth.getInstance().signOut();
             startWelcomeActivity();
         }
+        if(item.getItemId() == R.id.main_account_setting){
+           Intent startSetting = new Intent(MainActivity.this, SettingsActivity.class);
+           startActivity(startSetting);
+//            startActivity(new Intent(MainActivity.this, LoginActivity.class));
+        }
+
 
         return true;
     }

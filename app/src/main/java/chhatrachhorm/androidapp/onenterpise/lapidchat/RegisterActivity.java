@@ -18,6 +18,10 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.HashMap;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -30,6 +34,8 @@ public class RegisterActivity extends AppCompatActivity {
     private ProgressDialog mRegProgressDialog;
 
     private FirebaseAuth mAuth;
+
+    private DatabaseReference mDatabaseRef;
 
 
     @Override
@@ -78,19 +84,33 @@ public class RegisterActivity extends AppCompatActivity {
         });
     }
 
-    private void createUserWithEmailAndPassword(String email, String password, String username) {
+    private void createUserWithEmailAndPassword(String email, String password, final String username) {
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
 
-                            mRegProgressDialog.dismiss();
+                            mDatabaseRef = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
+                            HashMap<String, String> userMap = new HashMap<>();
+                            userMap.put("name", username);
+                            userMap.put("status", "Hi there, I am using LapidChat for secure talk!");
+                            userMap.put("image", "default");
+                            userMap.put("thumb_image", "default");
 
-                            Intent startMain = new Intent(RegisterActivity.this, MainActivity.class);
-                            startMain.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            startActivity(startMain);
-                            finish();
+                            mDatabaseRef.setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if(task.isSuccessful()){
+                                        mRegProgressDialog.dismiss();
+
+                                        Intent startMain = new Intent(RegisterActivity.this, MainActivity.class);
+                                        startMain.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        startActivity(startMain);
+                                        finish();
+                                    }
+                                }
+                            });
                         }else{
                             mRegProgressDialog.hide();
                             Toast.makeText(RegisterActivity.this, "Registration Fail", Toast.LENGTH_LONG).show();
