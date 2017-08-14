@@ -1,5 +1,6 @@
 package chhatrachhorm.androidapp.onenterpise.lapidchat;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -22,6 +23,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 
@@ -41,6 +43,8 @@ public class SettingsActivity extends AppCompatActivity {
 
     private StorageReference mStorageRef;
 
+    private ProgressDialog mProgressDialog;
+
     private static int GALLERY_PICK = 1;
 
     @Override
@@ -58,16 +62,18 @@ public class SettingsActivity extends AppCompatActivity {
         mFireBaseUser = FirebaseAuth.getInstance().getCurrentUser();
         userDatabaseRef = FirebaseDatabase.getInstance().getReference().child("users").child(mFireBaseUser.getUid());
 
+
         mStorageRef = FirebaseStorage.getInstance().getReference();
         userDatabaseRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String username = dataSnapshot.child("name").getValue().toString();
                 String status = dataSnapshot.child("status").getValue().toString();
-                String thumb_image = dataSnapshot.child("thumb_image").getValue().toString();
+                String image = dataSnapshot.child("image").getValue().toString();
 
                 mUsername.setText(username);
                 mStatus.setText(status);
+                Picasso.with(SettingsActivity.this).load(image).into(mCircleImageView);
             }
 
             @Override
@@ -98,9 +104,6 @@ public class SettingsActivity extends AppCompatActivity {
                 galleryIntent.setType("image/*");
                 galleryIntent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(Intent.createChooser(galleryIntent, "Select Image"), GALLERY_PICK);
-//                CropImage.activity()
-//                        .setGuidelines(CropImageView.Guidelines.ON)
-//                        .start(SettingsActivity.this);
             }
         });
 
@@ -119,14 +122,33 @@ public class SettingsActivity extends AppCompatActivity {
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
+                mProgressDialog = new ProgressDialog(SettingsActivity.this);
+                mProgressDialog.setTitle("Uploading Image");
+                mProgressDialog.setMessage("This may take a couple times...");
+                mProgressDialog.setCanceledOnTouchOutside(false);
+                mProgressDialog.show();
                 Uri resultUri = result.getUri();
-                StorageReference firebaseFilePath = mStorageRef.child("profile_images").child("test.jpg");
+                StorageReference firebaseFilePath = mStorageRef.child("profile_images").child(mFireBaseUser.getUid() + ".jpg");
                 firebaseFilePath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                         if(task.isSuccessful()){
-                            Toast.makeText(SettingsActivity.this, "Uploaded Finished", Toast.LENGTH_LONG).show();
-                        }else Toast.makeText(SettingsActivity.this, "Uploaded Failed", Toast.LENGTH_LONG).show();
+                            userDatabaseRef.child("image").setValue(task.getResult().getDownloadUrl().toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if(task.isSuccessful()){
+                                        mProgressDialog.dismiss();
+                                        Toast.makeText(SettingsActivity.this, "Uploaded Successfully", Toast.LENGTH_LONG).show();
+                                    }
+
+                                }
+                            });
+
+
+                        }else{
+                            mProgressDialog.dismiss();
+                            Toast.makeText(SettingsActivity.this, "Uploaded Failed", Toast.LENGTH_LONG).show();
+                        }
                     }
                 });
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {

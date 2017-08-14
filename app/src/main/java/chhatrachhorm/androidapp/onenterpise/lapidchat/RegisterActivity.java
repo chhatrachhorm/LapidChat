@@ -95,7 +95,7 @@ public class RegisterActivity extends AppCompatActivity {
                             HashMap<String, String> userMap = new HashMap<>();
                             userMap.put("name", username);
                             userMap.put("status", "Hi there, I am using LapidChat for secure talk!");
-                            userMap.put("image", "default");
+                            userMap.put("image", "https://firebasestorage.googleapis.com/v0/b/lapidchat-a1b4b.appspot.com/o/profile_images%2FPhotoAvatar.jpg?alt=media&token=c6e5d54f-97a8-49a3-b1cd-78ffd3a22a28");
                             userMap.put("thumb_image", "default");
 
                             mDatabaseRef.setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
