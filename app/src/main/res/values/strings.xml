@@ -21,4 +21,8 @@
     <string name="status_example">Hi, there! I am using LapidChat for Secure Talk!</string>
     <string name="change_status">Change Status</string>
     <string name="change_profile_picture">Change Profile Picture</string>
+    <string name="total_friends">Total Friends</string>
+    <string name="send_friend_request">Send Friend Request</string>
+    <string name="cancel_friend_request">Cancel Friend Request</string>
+    <string name="confirm_friends">Confirm Friend Request</string>
 </resources>

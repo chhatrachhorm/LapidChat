@@ -1,5 +1,6 @@
 package chhatrachhorm.androidapp.onenterpise.lapidchat;
-
+import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -56,10 +57,19 @@ public class UsersActivity extends AppCompatActivity {
             // DatabaseRef to store reference of the database
             // Adapter acts like a controller
             @Override
-            protected void populateViewHolder(UsersViewHolder viewHolder, Users model, int position) {
+            protected void populateViewHolder(UsersViewHolder viewHolder, Users model, final int position) {
                 viewHolder.setName(model.getName());
                 viewHolder.setStatus(model.getStatus());
-                viewHolder.setImage(model.getName());
+                viewHolder.setThumbImage(model.getThumb_image(), getApplicationContext());
+                viewHolder.mView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        String user_id = getRef(position).getKey();
+                        Intent startProfile = new Intent(UsersActivity.this, ProfileActivity.class);
+                        startProfile.putExtra("user_id", user_id);
+                        startActivity(startProfile);
+                    }
+                });
 
             }
         };
@@ -84,9 +94,9 @@ public class UsersActivity extends AppCompatActivity {
             TextView singleUserStatusView = mView.findViewById(R.id.single_user_status);
             singleUserStatusView.setText(status);
         }
-        public void setImage(String imageDownloadUrl){
+        public void setThumbImage(String thumbImageUrl, Context ctx){
             CircleImageView imageView = mView.findViewById(R.id.single_user_image);
-//            Picasso.with().load(imageDownloadUrl).into(imageView);
+            Picasso.with(ctx).load(thumbImageUrl).placeholder(R.drawable.default_avatar_male).into(imageView);
         }
 
     }

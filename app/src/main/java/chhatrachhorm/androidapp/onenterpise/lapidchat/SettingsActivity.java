@@ -2,6 +2,7 @@ package chhatrachhorm.androidapp.onenterpise.lapidchat;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -27,7 +28,14 @@ import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import de.hdodenhof.circleimageview.CircleImageView;
+import id.zelory.compressor.Compressor;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -69,11 +77,11 @@ public class SettingsActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String username = dataSnapshot.child("name").getValue().toString();
                 String status = dataSnapshot.child("status").getValue().toString();
-                String image = dataSnapshot.child("image").getValue().toString();
+                String image = dataSnapshot.child("thumb_image").getValue().toString();
 
                 mUsername.setText(username);
                 mStatus.setText(status);
-                Picasso.with(SettingsActivity.this).load(image).into(mCircleImageView);
+                Picasso.with(SettingsActivity.this).load(image).placeholder(R.drawable.default_avatar_male).into(mCircleImageView);
             }
 
             @Override
@@ -116,7 +124,10 @@ public class SettingsActivity extends AppCompatActivity {
         if(requestCode == GALLERY_PICK && resultCode == RESULT_OK){
             Uri imageUri = data.getData();
             // start cropping activity for pre-acquired image saved on the device
-            CropImage.activity(imageUri).setAspectRatio(1, 1).start(this);
+            CropImage.activity(imageUri)
+                    .setAspectRatio(1, 1)
+                    .setMinCropWindowSize(500, 500)
+                    .start(this);
         }
 
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
@@ -128,17 +139,52 @@ public class SettingsActivity extends AppCompatActivity {
                 mProgressDialog.setCanceledOnTouchOutside(false);
                 mProgressDialog.show();
                 Uri resultUri = result.getUri();
-                StorageReference firebaseFilePath = mStorageRef.child("profile_images").child(mFireBaseUser.getUid() + ".jpg");
-                firebaseFilePath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                File imagePath = new File(resultUri.getPath());
+                Bitmap thumb_image = null;
+                try {
+                    thumb_image = new Compressor(this)
+                            .setMaxHeight(200)
+                            .setMaxWidth(200)
+                            .setQuality(50)
+                            .compressToBitmap(imagePath);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                thumb_image.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                final byte[] thumbImageByte = baos.toByteArray();
+
+                StorageReference imageFirebaseFilePath = mStorageRef.child("profile_images").child(mFireBaseUser.getUid() + ".jpg");
+                final StorageReference thumbFirebaseFilePath = mStorageRef.child("thumb_images").child(mFireBaseUser.getUid() + ".jpg");
+                imageFirebaseFilePath.putFile(resultUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                    public void onComplete(@NonNull final Task<UploadTask.TaskSnapshot> task) {
                         if(task.isSuccessful()){
-                            userDatabaseRef.child("image").setValue(task.getResult().getDownloadUrl().toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            UploadTask uploadTask = thumbFirebaseFilePath.putBytes(thumbImageByte);
+                            uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                                 @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if(task.isSuccessful()){
-                                        mProgressDialog.dismiss();
-                                        Toast.makeText(SettingsActivity.this, "Uploaded Successfully", Toast.LENGTH_LONG).show();
+                                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> UploadTask) {
+                                    if(UploadTask.isSuccessful()){
+                                        String download_Url = task.getResult().getDownloadUrl().toString();
+                                        String thumb_download_url = UploadTask.getResult().getDownloadUrl().toString();
+                                        Map images = new HashMap();
+                                        images.put("image", download_Url);
+                                        images.put("thumb_image", thumb_download_url);
+                                        userDatabaseRef.updateChildren(images).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if(task.isSuccessful()){
+                                                    mProgressDialog.dismiss();
+                                                    Toast.makeText(SettingsActivity.this, "Uploaded Successfully", Toast.LENGTH_LONG).show();
+                                                }else{
+                                                    mProgressDialog.dismiss();
+                                                    Toast.makeText(SettingsActivity.this, "Uploaded Failed", Toast.LENGTH_LONG).show();
+
+                                                }
+
+                                            }
+                                        });
                                     }
 
                                 }
