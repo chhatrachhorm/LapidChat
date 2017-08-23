@@ -24,6 +24,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.theartofdev.edmodo.cropper.CropImage;
 
@@ -69,6 +71,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         mFireBaseUser = FirebaseAuth.getInstance().getCurrentUser();
         userDatabaseRef = FirebaseDatabase.getInstance().getReference().child("users").child(mFireBaseUser.getUid());
+        userDatabaseRef.keepSynced(true);
 
 
         mStorageRef = FirebaseStorage.getInstance().getReference();
@@ -77,11 +80,23 @@ public class SettingsActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String username = dataSnapshot.child("name").getValue().toString();
                 String status = dataSnapshot.child("status").getValue().toString();
-                String image = dataSnapshot.child("thumb_image").getValue().toString();
+                final String image = dataSnapshot.child("thumb_image").getValue().toString();
 
                 mUsername.setText(username);
                 mStatus.setText(status);
-                Picasso.with(SettingsActivity.this).load(image).placeholder(R.drawable.default_avatar_male).into(mCircleImageView);
+                Picasso.with(SettingsActivity.this).load(image).networkPolicy(NetworkPolicy.OFFLINE).placeholder(R.drawable.default_avatar_male)
+                        .into(mCircleImageView, new Callback() {
+                            @Override
+                            public void onSuccess() {
+
+                            }
+
+                            @Override
+                            public void onError() {
+                                Picasso.with(SettingsActivity.this).load(image).placeholder(R.drawable.default_avatar_male)
+                                        .into(mCircleImageView);
+                            }
+                        });
             }
 
             @Override

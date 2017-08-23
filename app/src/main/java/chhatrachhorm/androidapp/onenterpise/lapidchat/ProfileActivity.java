@@ -22,6 +22,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.text.DateFormat;
+import java.util.Date;
+
 public class ProfileActivity extends AppCompatActivity {
 
     private ImageView mImageView;
@@ -30,6 +33,7 @@ public class ProfileActivity extends AppCompatActivity {
     private ProgressDialog mProgressDialog;
 
     private DatabaseReference profileDatabaseRef;
+    private DatabaseReference friendReqDatabaseRef;
     private DatabaseReference friendDatabaseRef;
     private FirebaseUser mCurrentUser;
 
@@ -54,7 +58,9 @@ public class ProfileActivity extends AppCompatActivity {
         mProgressDialog.show();
 
         profileDatabaseRef = FirebaseDatabase.getInstance().getReference().child("users").child(user_id);
-        friendDatabaseRef = FirebaseDatabase.getInstance().getReference().child("friends");
+        friendReqDatabaseRef = FirebaseDatabase.getInstance().getReference().child("friends");
+        friendDatabaseRef = FirebaseDatabase.getInstance().getReference().child("lapid_friends");
+
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
 
         friendStatus = "not_friend";
@@ -69,7 +75,7 @@ public class ProfileActivity extends AppCompatActivity {
                 mStatus.setText(status);
                 Picasso.with(ProfileActivity.this).load(image).placeholder(R.drawable.default_avatar_male).into(mImageView);
 
-                friendDatabaseRef.child(mCurrentUser.getUid()).addValueEventListener(new ValueEventListener() {
+                friendReqDatabaseRef.child(mCurrentUser.getUid()).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if(dataSnapshot.hasChild(user_id)){
@@ -81,6 +87,21 @@ public class ProfileActivity extends AppCompatActivity {
                                 friendStatus = "req_received";
                                 mFriendReqBtn.setText(R.string.confirm_friends);
                             }
+                        }else{
+                            friendDatabaseRef.child(mCurrentUser.getUid()).addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    if(dataSnapshot.hasChild(user_id)){
+                                        friendStatus = "friend";
+                                        mFriendReqBtn.setText(R.string.unfriend);
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+                                    mProgressDialog.dismiss();
+                                }
+                            });
                         }
 
                         mProgressDialog.dismiss();
@@ -89,7 +110,7 @@ public class ProfileActivity extends AppCompatActivity {
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-
+                        mProgressDialog.dismiss();
                     }
                 });
 
@@ -106,12 +127,12 @@ public class ProfileActivity extends AppCompatActivity {
             public void onClick(View view) {
                 mFriendReqBtn.setEnabled(false);
                 if(friendStatus.equals("not_friend")){
-                    friendDatabaseRef.child(mCurrentUser.getUid()).child(user_id).child("request_type")
+                    friendReqDatabaseRef.child(mCurrentUser.getUid()).child(user_id).child("request_type")
                             .setValue("sent").addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if(task.isSuccessful()){
-                                friendDatabaseRef.child(user_id).child(mCurrentUser.getUid()).child("request_type")
+                                friendReqDatabaseRef.child(user_id).child(mCurrentUser.getUid()).child("request_type")
                                         .setValue("received").addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
@@ -131,10 +152,10 @@ public class ProfileActivity extends AppCompatActivity {
                     });
                 }
                 if(friendStatus.equals("req_sent")){
-                    friendDatabaseRef.child(mCurrentUser.getUid()).child(user_id).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                    friendReqDatabaseRef.child(mCurrentUser.getUid()).child(user_id).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
-                            friendDatabaseRef.child(user_id).child(mCurrentUser.getUid()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            friendReqDatabaseRef.child(user_id).child(mCurrentUser.getUid()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
                                     friendStatus = "not_friend";
@@ -145,6 +166,36 @@ public class ProfileActivity extends AppCompatActivity {
                             });
                         }
                     });
+                }
+                if(friendStatus.equals("req_received")){
+                    final String date = DateFormat.getDateTimeInstance().format(new Date()).toString();
+                    friendDatabaseRef.child(mCurrentUser.getUid()).child(user_id).setValue(date)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    friendDatabaseRef.child(user_id).child(mCurrentUser.getUid()).setValue(date)
+                                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    friendReqDatabaseRef.child(mCurrentUser.getUid()).child(user_id).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                        @Override
+                                                        public void onSuccess(Void aVoid) {
+                                                            friendReqDatabaseRef.child(user_id).child(mCurrentUser.getUid()).removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                @Override
+                                                                public void onSuccess(Void aVoid) {
+                                                                    friendStatus = "friend";
+                                                                    mFriendReqBtn.setEnabled(true);
+                                                                    mFriendReqBtn.setText(R.string.unfriend);
+                                                                }
+                                                            });
+                                                        }
+                                                    });
+
+                                                }
+                                            });
+
+                                }
+                            });
                 }
             }
         });

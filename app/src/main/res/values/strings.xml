@@ -25,4 +25,5 @@
     <string name="send_friend_request">Send Friend Request</string>
     <string name="cancel_friend_request">Cancel Friend Request</string>
     <string name="confirm_friends">Confirm Friend Request</string>
+    <string name="unfriend">Unfriend this Person</string>
 </resources>
