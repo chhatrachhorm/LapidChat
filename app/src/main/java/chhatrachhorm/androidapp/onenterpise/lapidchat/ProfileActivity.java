@@ -24,6 +24,7 @@ import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.HashMap;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -35,6 +36,8 @@ public class ProfileActivity extends AppCompatActivity {
     private DatabaseReference profileDatabaseRef;
     private DatabaseReference friendReqDatabaseRef;
     private DatabaseReference friendDatabaseRef;
+    private DatabaseReference notificationDBRef;
+
     private FirebaseUser mCurrentUser;
 
     private String friendStatus;
@@ -60,6 +63,7 @@ public class ProfileActivity extends AppCompatActivity {
         profileDatabaseRef = FirebaseDatabase.getInstance().getReference().child("users").child(user_id);
         friendReqDatabaseRef = FirebaseDatabase.getInstance().getReference().child("friends");
         friendDatabaseRef = FirebaseDatabase.getInstance().getReference().child("lapid_friends");
+        notificationDBRef = FirebaseDatabase.getInstance().getReference().child("notifications");
 
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -132,18 +136,31 @@ public class ProfileActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if(task.isSuccessful()){
-                                friendReqDatabaseRef.child(user_id).child(mCurrentUser.getUid()).child("request_type")
-                                        .setValue("received").addOnSuccessListener(new OnSuccessListener<Void>() {
+
+                                HashMap<String, String> noti = new HashMap<>();
+                                noti.put("from", mCurrentUser.getUid());
+                                noti.put("type", "request");
+
+                                notificationDBRef.child(user_id).push().setValue(noti).addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
-                                        friendStatus = "req_sent";
-                                        mFriendReqBtn.setEnabled(true);
-                                        mFriendReqBtn.setText(R.string.cancel_friend_request);
-                                        Toast.makeText(ProfileActivity.this, "Friend Request Sent", Toast.LENGTH_LONG).show();
+                                        friendReqDatabaseRef.child(user_id).child(mCurrentUser.getUid()).child("request_type")
+                                                .setValue("received").addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                friendStatus = "req_sent";
+                                                mFriendReqBtn.setEnabled(true);
+                                                mFriendReqBtn.setText(R.string.cancel_friend_request);
+                                                Toast.makeText(ProfileActivity.this, "Friend Request Sent", Toast.LENGTH_LONG).show();
 
+
+                                            }
+                                        });
 
                                     }
                                 });
+
+
                             }else{
                                 Toast.makeText(ProfileActivity.this, "Friend Request Failed", Toast.LENGTH_LONG).show();
                             }

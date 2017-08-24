@@ -20,6 +20,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.HashMap;
 
@@ -90,13 +91,15 @@ public class RegisterActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
+                            String deviceToken = FirebaseInstanceId.getInstance().getToken();
 
                             mDatabaseRef = FirebaseDatabase.getInstance().getReference().child("users").child(mAuth.getCurrentUser().getUid());
                             HashMap<String, String> userMap = new HashMap<>();
                             userMap.put("name", username);
                             userMap.put("status", "Hi there, I am using LapidChat for secure talk!");
                             userMap.put("image", "https://firebasestorage.googleapis.com/v0/b/lapidchat-a1b4b.appspot.com/o/profile_images%2FPhotoAvatar.jpg?alt=media&token=c6e5d54f-97a8-49a3-b1cd-78ffd3a22a28");
-                            userMap.put("thumb_image", "default");
+                            userMap.put("thumb_image", "https://firebasestorage.googleapis.com/v0/b/lapidchat-a1b4b.appspot.com/o/profile_images%2FPhotoAvatar.jpg?alt=media&token=c6e5d54f-97a8-49a3-b1cd-78ffd3a22a28");
+                            userMap.put("device_token", deviceToken);
 
                             mDatabaseRef.setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override

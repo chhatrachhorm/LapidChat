@@ -30,9 +30,11 @@ public class LapidChat extends Application {
         built.setIndicatorsEnabled(true);
         built.setLoggingEnabled(true);
         Picasso.setSingletonInstance(built);
-////      add this to gradle : compile compile 'com.squareup.okhttp:okhttp:2.5.0' which goes along with 'com.squareup.picasso:picasso:2.5.2'
-///       and add :
-//        Picasso.with(SettingsActivity.this).load(image).networkPolicy(NetworkPolicy.OFFLINE).placeholder(R.drawable.default_avatar_male)
+//      add this to gradle : compile compile 'com.squareup.okhttp:okhttp:2.5.0' which goes along with 'com.squareup.picasso:picasso:2.5.2'
+//      and add :
+//        Picasso.with(SettingsActivity.this).load(image_url)
+//                .networkPolicy(NetworkPolicy.OFFLINE)
+//                .placeholder(R.drawable.default_avatar_male)
 //                .into(mCircleImageView, new Callback() {
 //                    @Override
 //                    public void onSuccess() {
