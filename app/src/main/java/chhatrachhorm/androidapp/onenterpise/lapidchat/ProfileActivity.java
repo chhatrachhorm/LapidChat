@@ -186,7 +186,7 @@ public class ProfileActivity extends AppCompatActivity {
                 }
                 if(friendStatus.equals("req_received")){
                     final String date = DateFormat.getDateTimeInstance().format(new Date()).toString();
-                    friendDatabaseRef.child(mCurrentUser.getUid()).child(user_id).setValue(date)
+                    friendDatabaseRef.child(mCurrentUser.getUid()).child(user_id).child("date").setValue(date)
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
