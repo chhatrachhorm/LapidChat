@@ -42,4 +42,15 @@
         app:layout_constraintStart_toEndOf="@+id/single_user_image"
         app:layout_constraintTop_toBottomOf="@+id/single_user_username" />
 
+    <ImageView
+        android:id="@+id/single_user_online_icon"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="37dp"
+        android:visibility="invisible"
+        app:layout_constraintStart_toEndOf="@+id/single_user_username"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/greendot" />
+
 </android.support.constraint.ConstraintLayout>

@@ -19,6 +19,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
@@ -37,6 +38,7 @@ public class ProfileActivity extends AppCompatActivity {
     private DatabaseReference friendReqDatabaseRef;
     private DatabaseReference friendDatabaseRef;
     private DatabaseReference notificationDBRef;
+    private DatabaseReference mUserDatabaseRef;
 
     private FirebaseUser mCurrentUser;
 
@@ -65,7 +67,10 @@ public class ProfileActivity extends AppCompatActivity {
         friendDatabaseRef = FirebaseDatabase.getInstance().getReference().child("lapid_friends");
         notificationDBRef = FirebaseDatabase.getInstance().getReference().child("notifications");
 
+
         mCurrentUser = FirebaseAuth.getInstance().getCurrentUser();
+        mUserDatabaseRef = FirebaseDatabase.getInstance().getReference().child("users").child(mCurrentUser.getUid());
+
 
         friendStatus = "not_friend";
 
@@ -190,7 +195,7 @@ public class ProfileActivity extends AppCompatActivity {
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
-                                    friendDatabaseRef.child(user_id).child(mCurrentUser.getUid()).setValue(date)
+                                    friendDatabaseRef.child(user_id).child(mCurrentUser.getUid()).child("date").setValue(date)
                                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                 @Override
                                                 public void onSuccess(Void aVoid) {
@@ -219,5 +224,19 @@ public class ProfileActivity extends AppCompatActivity {
 
 
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mUserDatabaseRef.child("online").setValue(true);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if(currentUser != null)
+            mUserDatabaseRef.child("online").setValue(ServerValue.TIMESTAMP);
     }
 }

@@ -20,6 +20,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -74,6 +75,8 @@ public class SettingsActivity extends AppCompatActivity {
         userDatabaseRef.keepSynced(true);
 
 
+
+
         mStorageRef = FirebaseStorage.getInstance().getReference();
         userDatabaseRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -111,6 +114,7 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        userDatabaseRef.child("online").setValue(true);
         mChangeStatusBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -218,5 +222,11 @@ public class SettingsActivity extends AppCompatActivity {
             }
         }
 
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        userDatabaseRef.child("online").setValue(ServerValue.TIMESTAMP);
     }
 }

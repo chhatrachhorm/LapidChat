@@ -17,6 +17,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 
 public class StatusChangesActivity extends AppCompatActivity {
 
@@ -46,6 +47,8 @@ public class StatusChangesActivity extends AppCompatActivity {
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
         mDatabaseUserRef = FirebaseDatabase.getInstance().getReference().child("users").child(currentUser.getUid());
 
+
+
         mSaveChangesBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -71,5 +74,17 @@ public class StatusChangesActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mDatabaseUserRef.child("online").setValue(true);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mDatabaseUserRef.child("online").setValue(ServerValue.TIMESTAMP);
     }
 }
